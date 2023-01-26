@@ -16,3 +16,5 @@ this test runs on all three control plane nodes.
 3. Update the parallelism to ensure the correct number of pods are deployed.
 4. Apply `job.yaml`.
 5. Wait for the job to complete.
+
+Once all completions have occurred, or 60 seconds have passed, the job is done.  Check the pods for errors.
