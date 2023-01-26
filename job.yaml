@@ -1,0 +1,35 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: hairpin-test
+spec:
+  parallelism: 3
+  completions: 3
+  template:
+    metadata:
+      labels:
+        app: hairpin-test
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - topologyKey: "kubernetes.io/hostname"
+              labelSelector:
+                matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                      - hairpin-test
+      nodeSelector:
+        node-role.kubernetes.io/control-plane: ''
+      tolerations:
+        - key: node-role.kubernetes.io/master
+          operator: Exists
+      containers:
+        - name: test
+          image: <your registry>/hairpin-test:latest
+          env:
+            - name: SSL_CERT_FILE
+              value: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+          command: ["./hairpin-test",  "--url", "<url>"]
+      restartPolicy: Never
